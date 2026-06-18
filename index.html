@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-Care Receipt Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">NURS 180 Weekly Wellness Log</p>
+        <h1>Self-Care Receipt Generator</h1>
+        <p class="subtitle">Track six weekly self-care practices and print receipt-style proof of care.</p>
+      </div>
+      <div class="header-actions">
+        <button class="secondary-button" id="loadSampleButton" type="button">Load Tony's Data</button>
+      </div>
+    </header>
+
+    <section class="status-strip" aria-label="Project status">
+      <div>
+        <strong>06</strong>
+        <span>Weekly Logs</span>
+      </div>
+      <div>
+        <strong>Auto</strong>
+        <span>Theme Match</span>
+      </div>
+      <div>
+        <strong>PDF</strong>
+        <span>Print Ready</span>
+      </div>
+      <div>
+        <strong>Care</strong>
+        <span>Receipt Gallery</span>
+      </div>
+    </section>
+
+    <section class="dashboard-grid" aria-label="Self-care receipt generator workspace">
+      <section class="panel logger-panel" aria-labelledby="loggerTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Step 1</p>
+          <h2 id="loggerTitle">Self-Care Logger</h2>
+        </div>
+
+        <form id="selfCareForm">
+          <div class="form-row">
+            <label for="weekNumber">Week number</label>
+            <select id="weekNumber" name="weekNumber" required>
+              <option value="1">Week 1</option>
+              <option value="2">Week 2</option>
+              <option value="3">Week 3</option>
+              <option value="4">Week 4</option>
+              <option value="5">Week 5</option>
+              <option value="6">Week 6</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="courseTheme">Course theme</label>
+            <textarea id="courseTheme" name="courseTheme" rows="3" readonly></textarea>
+          </div>
+
+          <div class="form-row">
+            <label for="activity">Self-care activity</label>
+            <input id="activity" name="activity" type="text" placeholder="Example: Mindful walk after class" required>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="domain">Self-care domain</label>
+              <select id="domain" name="domain" required>
+                <option value="Physical">Physical</option>
+                <option value="Emotional">Emotional</option>
+                <option value="Social">Social</option>
+                <option value="Spiritual">Spiritual</option>
+                <option value="Academic/Professional">Academic/Professional</option>
+                <option value="Personal">Personal</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="minutes">Time spent in minutes</label>
+              <input id="minutes" name="minutes" type="number" min="1" max="999" placeholder="30" required>
+            </div>
+          </div>
+
+          <div class="metrics-grid" aria-label="Stress and energy ratings">
+            <div class="form-row">
+              <label for="stressBefore">Stress before</label>
+              <input id="stressBefore" name="stressBefore" type="number" min="1" max="10" required>
+            </div>
+            <div class="form-row">
+              <label for="stressAfter">Stress after</label>
+              <input id="stressAfter" name="stressAfter" type="number" min="1" max="10" required>
+            </div>
+            <div class="form-row">
+              <label for="energyBefore">Energy before</label>
+              <input id="energyBefore" name="energyBefore" type="number" min="1" max="10" required>
+            </div>
+            <div class="form-row">
+              <label for="energyAfter">Energy after</label>
+              <input id="energyAfter" name="energyAfter" type="number" min="1" max="10" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="reflection">Short reflection</label>
+            <textarea id="reflection" name="reflection" rows="4" placeholder="What changed after this activity?" required></textarea>
+          </div>
+
+          <div class="form-row">
+            <label for="evidenceImage">Evidence image upload</label>
+            <input id="evidenceImage" name="evidenceImage" type="file" accept="image/*" required>
+          </div>
+
+          <div class="image-preview" id="imagePreview" aria-live="polite">
+            <span>Image preview will appear here.</span>
+          </div>
+
+          <button class="submit-button" type="submit">Generate Receipt</button>
+        </form>
+      </section>
+
+      <section class="panel preview-panel" aria-labelledby="previewTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Step 2</p>
+          <h2 id="previewTitle">Generated Receipt Preview</h2>
+        </div>
+        <div class="printer-shell">
+          <div class="printer-slot">
+            <span>Thermal Wellness Printer</span>
+          </div>
+          <div id="receiptPreview" class="preview-empty">
+            <p>Your latest receipt will print here after you submit the form.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="panel summary-panel" aria-labelledby="summaryTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Step 3</p>
+          <h2 id="summaryTitle">Weekly Receipt Gallery / Semester Summary</h2>
+        </div>
+        <button class="secondary-button compact-button" id="downloadAllButton" type="button">Download All PDF</button>
+      </div>
+
+      <div class="summary-grid" aria-label="Semester summary">
+        <article class="summary-card">
+          <span>Total sessions</span>
+          <strong id="totalSessions">0</strong>
+        </article>
+        <article class="summary-card">
+          <span>Total time invested</span>
+          <strong id="totalMinutes">0 min</strong>
+        </article>
+        <article class="summary-card">
+          <span>Average stress reduction</span>
+          <strong id="averageStress">0.0</strong>
+        </article>
+        <article class="summary-card">
+          <span>Average energy increase</span>
+          <strong id="averageEnergy">0.0</strong>
+        </article>
+        <article class="summary-card">
+          <span>Most common domain</span>
+          <strong id="commonDomain">None yet</strong>
+        </article>
+      </div>
+
+      <div class="gallery-flow" id="receiptGallery" aria-live="polite">
+        <p class="gallery-empty">No receipts logged yet. Submit the form or load sample data.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
