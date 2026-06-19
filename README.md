@@ -10,6 +10,8 @@ You do not need VS Code, a code editor, npm, or a terminal.
 2. Double-click `index.html`.
 3. The app will open in the computer's web browser.
 
+This is in terminal:
+
 On macOS:
 
 ```bash
@@ -26,18 +28,7 @@ No install, server, backend, npm, or internet connection is required.
 
 ## Evaluator Handoff
 
-Send the evaluator `self-care-receipt-generator.zip`, or send these files together in one folder:
-
-- `index.html`
-- `style.css`
-- `script.js`
-- `README.md`
-- `assets/tony-week1.jpeg`
-- `assets/tony-week2.jpeg`
-- `assets/tony-week3.jpeg`
-- `assets/tony-week4.jpeg`
-- `assets/tony-week5.jpeg`
-- `assets/tony-week6.jpeg`
+Open the `self-care-receipt-generator.zip`
 
 The evaluator only needs to unzip the folder and double-click `index.html`. They do not need VS Code.
 

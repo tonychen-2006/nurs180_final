@@ -37,6 +37,9 @@ const receiptCodes = {
   Personal: "RESET"
 };
 
+const TIME_TAX_MINUTES = 15;
+const TIME_TAX_SOURCE = "Stress + poor sleep + overthinking";
+
 function updateTheme() {
   courseTheme.value = weekThemes[weekNumber.value];
 }
@@ -70,6 +73,14 @@ function createReceiptKey() {
   return `receipt-${Date.now()}-${Math.round(Math.random() * 100000)}`;
 }
 
+function getTimeTaxMinutes(receipt) {
+  return Number.isFinite(receipt.timeTaxMinutes) ? receipt.timeTaxMinutes : TIME_TAX_MINUTES;
+}
+
+function getNetHealthMinutes(receipt) {
+  return Math.max(receipt.minutes - getTimeTaxMinutes(receipt), 0);
+}
+
 function formatReceiptDate(dateValue) {
   return new Date(dateValue).toLocaleDateString("en-US", {
     month: "2-digit",
@@ -90,6 +101,8 @@ function escapeHtml(value) {
 // Receipt generation: returns the full receipt-style HTML card used in preview, gallery, and PDF printing.
 function generateReceiptCard(receipt) {
   const imagePosition = receipt.imagePosition || "center center";
+  const timeTaxMinutes = getTimeTaxMinutes(receipt);
+  const netHealthMinutes = getNetHealthMinutes(receipt);
 
   return `
     <article class="receipt-card">
@@ -111,10 +124,11 @@ function generateReceiptCard(receipt) {
       </div>
       <hr class="receipt-divider">
       <div class="receipt-totals">
-        <div><span>TIME TAX</span><strong>${receipt.minutes} MIN</strong></div>
+        <div><span>HEALTH TIME</span><strong>${receipt.minutes} MIN</strong></div>
+        <div><span>TIME TAX</span><strong>-${timeTaxMinutes} MIN</strong></div>
         <div><span>STRESS</span><strong>${receipt.stressBefore} &rarr; ${receipt.stressAfter}</strong></div>
         <div><span>ENERGY</span><strong>${receipt.energyBefore} &rarr; ${receipt.energyAfter}</strong></div>
-        <div class="receipt-grand-total"><span>TOTAL PAID</span><strong>${receipt.minutes} MIN</strong></div>
+        <div class="receipt-grand-total"><span>TOTAL PAID</span><strong>${netHealthMinutes} MIN</strong></div>
       </div>
       <hr class="receipt-rule">
       <div class="receipt-table-head">
@@ -125,6 +139,7 @@ function generateReceiptCard(receipt) {
       <div class="receipt-table">
         <div><span>Stress Reduction</span><strong>${receipt.stressReduction}</strong></div>
         <div><span>Energy Increase</span><strong>${receipt.energyIncrease}</strong></div>
+        <div><span>Time Tax Source</span><strong>${escapeHtml(TIME_TAX_SOURCE)}</strong></div>
         <div><span>Return Received</span><strong>${escapeHtml(receipt.returnReceived)}</strong></div>
       </div>
       <img class="evidence-image" src="${receipt.image}" alt="Evidence for ${escapeHtml(receipt.activity)}" style="object-position: ${imagePosition};">
@@ -269,6 +284,8 @@ function createPdfBytes(receiptList, imageList) {
     let y = 720;
     const imageData = imageList[index];
     let imageId = null;
+    const timeTaxMinutes = getTimeTaxMinutes(receipt);
+    const netHealthMinutes = getNetHealthMinutes(receipt);
 
     if (imageData) {
       imageId = addObject([
@@ -311,8 +328,11 @@ function createPdfBytes(receiptList, imageList) {
     y -= 10;
     content += "[5 5] 0 d 106 " + y + " m 506 " + y + " l S [] 0 d\n";
     y -= 28;
-    content += textLine(250, y, "TIME TAX", 12, "F3");
+    content += textLine(250, y, "HEALTH TIME", 12, "F3");
     content += textLine(440, y, `${receipt.minutes} MIN`, 12, "F2");
+    y -= 18;
+    content += textLine(250, y, "TIME TAX", 12, "F3");
+    content += textLine(440, y, `-${timeTaxMinutes} MIN`, 12, "F2");
     y -= 18;
     content += textLine(250, y, "STRESS", 12, "F3");
     content += textLine(452, y, `${receipt.stressBefore} -> ${receipt.stressAfter}`, 12, "F2");
@@ -321,7 +341,7 @@ function createPdfBytes(receiptList, imageList) {
     content += textLine(452, y, `${receipt.energyBefore} -> ${receipt.energyAfter}`, 12, "F2");
     y -= 22;
     content += textLine(250, y, "TOTAL PAID", 13, "F2");
-    content += textLine(440, y, `${receipt.minutes} MIN`, 13, "F2");
+    content += textLine(440, y, `${netHealthMinutes} MIN`, 13, "F2");
     y -= 32;
     content += `106 ${y} m 506 ${y} l S\n`;
     y -= 26;
@@ -335,6 +355,9 @@ function createPdfBytes(receiptList, imageList) {
     y -= 17;
     content += textLine(106, y, "Energy Increase", 10, "F2");
     content += textLine(470, y, receipt.energyIncrease, 10, "F2");
+    y -= 17;
+    content += textLine(106, y, "Time Tax Source", 10, "F2");
+    content += textLine(302, y, TIME_TAX_SOURCE, 9, "F3");
     y -= 22;
     content += textLine(106, y, "Return Received", 10, "F2");
     y -= 16;
@@ -576,6 +599,7 @@ form.addEventListener("submit", (event) => {
     energyBefore,
     energyAfter,
     energyIncrease,
+    timeTaxMinutes: TIME_TAX_MINUTES,
     returnReceived: getReturnMessage(stressReduction, energyIncrease),
     reflection: data.get("reflection").trim(),
     image: uploadedImageData,
@@ -695,6 +719,7 @@ function loadSampleData() {
       theme: weekThemes[log.week],
       stressReduction,
       energyIncrease,
+      timeTaxMinutes: TIME_TAX_MINUTES,
       returnReceived: getReturnMessage(stressReduction, energyIncrease),
       createdAt: new Date(2026, 4, 13 + index * 7).toISOString(),
       key: `sample-week-${log.week}`
